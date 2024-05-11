@@ -1,0 +1,1 @@
+An experimental app to remote-control several video/image players in sync.
