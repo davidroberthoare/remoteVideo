@@ -1,20 +1,23 @@
 import socket
-from time import sleep
+from time import sleep, time
+import marshal
 
 MCAST_GRP = '224.1.1.1'
-MCAST_PORT = 5007
-# regarding socket.IP_MULTICAST_TTL
-# ---------------------------------
-# for all packets sent, after two hops on the network the packet will not 
-# be re-sent/broadcast (see https://www.tldp.org/HOWTO/Multicast-HOWTO-6.html)
+MCAST_PORT = 8080
 MULTICAST_TTL = 2
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
 sock.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, MULTICAST_TTL)
 
-# For Python 3, change next line to 'sock.sendto(b"robot", ...' to avoid the
-# "bytes-like object is required" msg (https://stackoverflow.com/a/42612820)
+def broadcast(data_dict):
+    data_dict['timestamp'] = time()
+    try:
+        sock.sendto(marshal.dumps(data_dict), (MCAST_GRP, MCAST_PORT))
+    except Exception as e:
+        print(f"Error sending data: {e}")
+
 while True:
     print("sending multicast packet...")
-    sock.sendto(b"robot", (MCAST_GRP, MCAST_PORT))
-    sleep(1)
+    message = {"hello": "world"}
+    broadcast(message) 
+    sleep(2)
