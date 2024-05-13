@@ -1,0 +1,24 @@
+#:kivy 1.0.9
+
+
+FloatLayout:
+    Image:
+        id: image1
+        source: "media/test1.jpg"
+        keep_ratio: True
+        allow_stretch: True
+
+    Image:
+        id: image2
+        source: "media/test3.jpg"
+        keep_ratio: True
+        allow_stretch: True
+        opacity: 0.5
+
+    Video:
+        id: video
+        source: "media/test1.mp4"
+        state: 'play'
+        eos: 'loop'
+        keep_ratio: True
+        allow_stretch: True

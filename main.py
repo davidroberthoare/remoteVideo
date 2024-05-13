@@ -5,7 +5,6 @@ from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.image import Image
 from kivy.uix.video import Video
 from kivy.core.window import Window
-from kivy.graphics import Color, Rectangle
 
 
 class KivyApp(App):
@@ -45,10 +44,7 @@ class KivyApp(App):
         Clock.schedule_interval(fade_image, 0.01)
         
         
-        # Add a Canvas widget to draw a black rectangle as the initial background
-        with main_window.canvas:
-            Color(0, 0, 0, 1)  # Set the color to black
-            Rectangle(pos=(0, 0), size=(Window.width, Window.height))  # Draw a rectangle that covers the entire window
+        
 
 
         return main_window
