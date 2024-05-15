@@ -1,24 +1,29 @@
 #:kivy 1.0.9
 # THE CLIENT LAYOUT FILE
 
-FloatLayout:
+<ClientLayout>:
     Image:
         id: image1
-        source: "media/test1.jpg"
+        source: "media/black.png"
         keep_ratio: True
         allow_stretch: True
-
-    Image:
-        id: image2
-        source: "media/test3.jpg"
-        keep_ratio: True
-        allow_stretch: True
-        opacity: 0.5
+        opacity:1
 
     Video:
-        id: video
-        source: "media/test1.mp4"
-        state: 'play'
-        eos: 'loop'
+        id: video1
+        # source: "media/black.png"
+        # state: 'play'
+        # eos: 'loop'
         keep_ratio: True
         allow_stretch: True
+        volume: 0
+        opacity:0
+        preview: "media/black.png"
+        on_position: root.on_position_change(self.position)
+        on_duration: root.on_duration_change(self.duration)
+        on_eos: root.on_eos_change(self.eos)
+
+    Label:
+        id: status_text
+        text: 'test text'
+        size_hint: (1, .1)
