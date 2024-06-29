@@ -15,6 +15,9 @@ import struct
 import marshal
 import threading
 
+# other misc libraries
+import json, os
+
 # network settings
 MCAST_GRP = '224.1.1.1'
 MCAST_PORT = 8080
@@ -108,9 +111,9 @@ class ClientApp(App):
     def build(self):
         # Set the window properties
         Window.size = (Window.width, Window.height)
-        # Window.borderless = True
-        # Window.fullscreen = True
-        Window.show_cursor = False
+        Window.borderless = show['window']['borderless']
+        Window.fullscreen = show['window']['fullscreen']
+        Window.show_cursor = show['window']['show_cursor']
         
         root = ClientLayout()
         # root.playImage("media/test1.jpg")
@@ -123,6 +126,35 @@ class ClientApp(App):
         
         return root
 
+
+
+def load_show(file_path):
+    if os.path.exists(file_path):
+        with open(file_path, 'r') as f:
+            data = json.load(f)
+        return data
+    else:
+        print(f"The file {file_path} does not exist.")
+        return {}
+
+def save_show(show):
+    sorted_show = dict(sorted(show.items()))
+    with open('media/show.json', 'w') as f:
+        json.dump(sorted_show, f, indent=4)
+
+
+#*********** 
+# set the global variable "show" for the client.
+# this is written to as needed by the client and saved whenever updated with received data from server
+show = {}
+#load settings file, or default
+if os.path.exists('media/show.json'):
+    show = load_show('media/show.json')
+else:
+    show = load_show('default_show.json')
+print("show:")
+print(show)
+#******** end show setup
 
 if __name__ == "__main__":
     ClientApp().run()

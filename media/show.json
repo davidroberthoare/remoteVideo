@@ -1,0 +1,9 @@
+{
+    "foo": "barbarella",
+    "new": true,
+    "window": {
+        "borderless" : false,
+        "fullscreen" : false,
+        "show_cursor" : false
+    }
+}

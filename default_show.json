@@ -1,0 +1,6 @@
+{
+    "foo":"bar",
+    "testobject": {
+        "nested":"value"
+    }
+}
