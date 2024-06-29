@@ -110,6 +110,7 @@ class ClientApp(App):
         Window.size = (Window.width, Window.height)
         # Window.borderless = True
         # Window.fullscreen = True
+        Window.show_cursor = False
         
         root = ClientLayout()
         # root.playImage("media/test1.jpg")
