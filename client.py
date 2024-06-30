@@ -18,7 +18,6 @@ import threading
 
 # other misc libraries
 import json, os
-import time
 
 # network settings
 MCAST_GRP = '224.1.1.1'
@@ -47,12 +46,6 @@ class MulticastListenerThread(threading.Thread):
             if 'type' in received_dict:
                 if received_dict['type'] == 'test':
                     self.root.updateStatus(received_dict['value'])
-                    
-                # elif received_dict['type'] == 'image':
-                #     self.root.updateStatus(received_dict['value'])
-                #     self.root.playImage(received_dict['value'])
-                    
-                # elif received_dict['type'] == 'video':
                 else:
                     self.sm.changeMedia(received_dict['value'])
                     
@@ -64,7 +57,6 @@ class ClientScreen(Screen):
     
     def on_leave(self, *args):
         print("LEFT SCREEN")
-        # self.stopMedia()
         
         
     def on_duration_change(instance, value=None):
@@ -75,11 +67,6 @@ class ClientScreen(Screen):
     def on_eos_change(instance, value=None):
         print('The EOS of the video is', value)
     
-    @mainthread
-    # def toTop(self, player):
-    #     # self.ids.image1.opacity = 0
-    #     self.ids.video.opacity = 0
-    #     player.opacity = 1   #on top
         
     def updateStatus(self, text):
         self.ids.status_text.text = text
@@ -88,30 +75,12 @@ class ClientScreen(Screen):
     def playMedia(self, path, options=None): 
         vid = self.ids.videoplayer
         vid.source = path
-        # self.toTop(vid)
         
         vid.state = 'play'
         vid.opacity = 1
         self.updateStatus(f"playing video: {path}")
         pass
     
-    # @mainthread
-    # def stopMedia(self): 
-    #     vid = self.ids.videoplayer
-    #     # vid.state = 'stop'
-    #     self.updateStatus(f"stopped")
-    #     pass
-    
-    # # # Define the fade function
-    # # self.fadeAmount = 0.01
-    # # def fade_image(dt):
-    # #     image = self.root.ids.video
-    # #     if image.opacity < 0 or image.opacity > 1:
-    # #         self.fadeAmount *= -1     
-    # #     image.opacity += self.fadeAmount
-
-    # # # Start the clock to call the fade function every 2 seconds
-    # # Clock.schedule_interval(fade_image, 0.01)
 
 class customScreenManager(ScreenManager):
     @mainthread
