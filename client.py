@@ -3,6 +3,7 @@ import kivy
 from kivy.app import App
 from kivy.clock import Clock
 from kivy.clock import mainthread
+from kivy.uix.screenmanager import ScreenManager, Screen, FadeTransition
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.image import Image
 from kivy.uix.video import Video
@@ -17,6 +18,7 @@ import threading
 
 # other misc libraries
 import json, os
+import time
 
 # network settings
 MCAST_GRP = '224.1.1.1'
@@ -31,10 +33,10 @@ sock.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)
 
 
 class MulticastListenerThread(threading.Thread):
-    def __init__(self, sock, root):
+    def __init__(self, sock, sm):
         threading.Thread.__init__(self)
         self.sock = sock
-        self.root = root
+        self.sm = sm
 
     def run(self):
         while True:
@@ -46,19 +48,25 @@ class MulticastListenerThread(threading.Thread):
                 if received_dict['type'] == 'test':
                     self.root.updateStatus(received_dict['value'])
                     
-                elif received_dict['type'] == 'image':
-                    self.root.updateStatus(received_dict['value'])
-                    self.root.playImage(received_dict['value'])
+                # elif received_dict['type'] == 'image':
+                #     self.root.updateStatus(received_dict['value'])
+                #     self.root.playImage(received_dict['value'])
                     
-                elif received_dict['type'] == 'video':
-                    self.root.updateStatus(received_dict['value'])
-                    self.root.playVideo(received_dict['value'])
+                # elif received_dict['type'] == 'video':
+                else:
+                    self.sm.changeMedia(received_dict['value'])
+                    
 
 
 
 
-class ClientLayout(FloatLayout):
+class ClientScreen(Screen):
     
+    def on_leave(self, *args):
+        print("LEFT SCREEN")
+        # self.stopMedia()
+        
+        
     def on_duration_change(instance, value=None):
         print('The duration of the video is', value)
     def on_position_change(instance, value=None):
@@ -68,29 +76,31 @@ class ClientLayout(FloatLayout):
         print('The EOS of the video is', value)
     
     @mainthread
-    def toTop(self, player):
-        self.ids.image1.opacity = 0
-        self.ids.video1.opacity = 0
-        player.opacity = 1   #on top
+    # def toTop(self, player):
+    #     # self.ids.image1.opacity = 0
+    #     self.ids.video.opacity = 0
+    #     player.opacity = 1   #on top
         
     def updateStatus(self, text):
         self.ids.status_text.text = text
+        
     @mainthread
-    def playImage(self, path, options=None):
-        img = self.ids.image1
-        img.source = path
-        self.toTop(img)
-        self.updateStatus(f"playing image: {path}")
-        pass
-    @mainthread
-    def playVideo(self, path, options=None): 
-        vid = self.ids.video1
+    def playMedia(self, path, options=None): 
+        vid = self.ids.videoplayer
         vid.source = path
-        self.toTop(vid)
+        # self.toTop(vid)
         
         vid.state = 'play'
+        vid.opacity = 1
         self.updateStatus(f"playing video: {path}")
         pass
+    
+    # @mainthread
+    # def stopMedia(self): 
+    #     vid = self.ids.videoplayer
+    #     # vid.state = 'stop'
+    #     self.updateStatus(f"stopped")
+    #     pass
     
     # # # Define the fade function
     # # self.fadeAmount = 0.01
@@ -102,9 +112,18 @@ class ClientLayout(FloatLayout):
 
     # # # Start the clock to call the fade function every 2 seconds
     # # Clock.schedule_interval(fade_image, 0.01)
-    
-    
-        
+
+class customScreenManager(ScreenManager):
+    @mainthread
+    def changeMedia(self, path):
+        print("Changing Media")
+        old_screen = self.get_screen(self.current)
+        new_screen = self.get_screen(self.next())
+        new_screen.playMedia(path)
+        # time.sleep(1)
+        self.current = new_screen.name
+        # time.sleep(2)
+
     
 class ClientApp(App):
         
@@ -114,17 +133,21 @@ class ClientApp(App):
         Window.borderless = show['window']['borderless']
         Window.fullscreen = show['window']['fullscreen']
         Window.show_cursor = show['window']['show_cursor']
+        # Window.clearcolor = (0, 0, 0, 1)
+        # Window.clear()
         
-        root = ClientLayout()
-        # root.playImage("media/test1.jpg")
-        # root.playVideo("media/test3.mp4")
+        # Create the screen manager
+        sm = customScreenManager(transition=FadeTransition(duration=1))
+        sm.add_widget(ClientScreen(name='s1'))
+        sm.add_widget(ClientScreen(name='s2'))
         
-        
-        listener_thread = MulticastListenerThread(sock, root)
+        listener_thread = MulticastListenerThread(sock, sm)
         listener_thread.setDaemon(True)
         listener_thread.start() 
         
-        return root
+        return sm
+        
+    
 
 
 
