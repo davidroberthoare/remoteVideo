@@ -56,7 +56,8 @@ class MulticastListenerThread(threading.Thread):
 class ClientScreen(Screen):
     
     def on_leave(self, *args):
-        print("LEFT SCREEN")
+        # print("LEFT SCREEN")
+        pass
         
         
     def on_duration_change(instance, value=None):
@@ -75,9 +76,8 @@ class ClientScreen(Screen):
     def playMedia(self, path, options=None): 
         vid = self.ids.videoplayer
         vid.source = path
-        
         vid.state = 'play'
-        vid.opacity = 1
+        vid.opacity = 1 #just because the initial state is transparent
         self.updateStatus(f"playing video: {path}")
         pass
     
@@ -89,9 +89,7 @@ class customScreenManager(ScreenManager):
         old_screen = self.get_screen(self.current)
         new_screen = self.get_screen(self.next())
         new_screen.playMedia(path)
-        # time.sleep(1)
         self.current = new_screen.name
-        # time.sleep(2)
 
     
 class ClientApp(App):
@@ -102,8 +100,6 @@ class ClientApp(App):
         Window.borderless = show['window']['borderless']
         Window.fullscreen = show['window']['fullscreen']
         Window.show_cursor = show['window']['show_cursor']
-        # Window.clearcolor = (0, 0, 0, 1)
-        # Window.clear()
         
         # Create the screen manager
         sm = customScreenManager(transition=FadeTransition(duration=1))
@@ -140,8 +136,8 @@ def save_show(show):
 # this is written to as needed by the client and saved whenever updated with received data from server
 show = {}
 #load settings file, or default
-if os.path.exists('media/show.json'):
-    show = load_show('media/show.json')
+if os.path.exists('show.json'):
+    show = load_show('show.json')
 else:
     show = load_show('default_show.json')
 print("show:")
